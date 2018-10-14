@@ -1,0 +1,6 @@
+rootProject.name = 'blackduck'
+
+include (
+        "test-api",
+        "test-model"
+)

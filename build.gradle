@@ -1,0 +1,72 @@
+group 'com.clicktools.jenkins'
+version '1.0-SNAPSHOT'
+
+buildscript {
+    repositories {
+        jcenter()
+        mavenCentral()
+        maven {
+            url "https://plugins.gradle.org/m2"
+        }
+        dependencies {
+            classpath (
+                    'com.netflix.nebula:nebula-dependency-recommender:4.0.2'
+            )
+        }
+    }
+}
+
+allprojects {
+    apply plugin: 'java'
+    apply plugin: 'idea'
+    apply plugin: 'application'
+    apply plugin: 'nebula.dependency-recommender'
+
+    repositories {
+        mavenCentral()
+        jcenter()
+        maven { url "http://repo.jenkins-ci.org/releases" }
+    }
+
+    sourceCompatibility = 1.8
+    targetCompatibility = 1.8
+
+    dependencies {
+        compile "org.apache.logging.log4j:log4j-api:${log4j2_version}"
+        compile "org.apache.logging.log4j:log4j-core:${log4j2_version}"
+
+        testCompile "junit:junit:${junit_version}"
+        testCompile "org.mockito:mockito-core:${mockito_version}"
+    }
+}
+
+project(':test-api') {
+    mainClassName = 'com.clicktools.api.EmbeddedGrizzleyServer'
+
+    dependencies {
+        compile project(':test-model')
+
+        nebulaRecommenderBom "org.glassfish.jersey:jersey-bom:${jerseyVersion}"
+
+        compile group: 'org.glassfish.jersey.containers', name: 'jersey-container-grizzly2-http', version: "${jerseyVersion}"
+
+        compile group: 'org.glassfish.jersey.ext', name: 'jersey-bean-validation', version: "${jerseyVersion}"
+        compile group: 'org.glassfish.jersey.media', name: 'jersey-media-multipart', version: "${jerseyVersion}"
+
+        // https://mvnrepository.com/artifact/org.glassfish.grizzly/grizzly-http-server
+        compile group: 'org.glassfish.grizzly', name: 'grizzly-http-server', version: '2.3.19'
+
+        // json
+        compile group: 'com.fasterxml.jackson.core', name: 'jackson-databind', version: "${jacksonVersion}"
+        compile group: 'com.fasterxml.jackson.jaxrs', name: 'jackson-databind', version: "${jacksonVersion}"
+
+    }
+}
+
+project(':test-model') {
+    dependencies {
+        compile group: 'mysql', name: 'mysql-connector-java', version: '5.1.6'
+
+        compile group: 'org.json', name: 'json', version: '20180130'
+    }
+}
